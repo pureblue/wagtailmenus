@@ -76,6 +76,40 @@ def flat_menu(
         **kwargs
     )
 
+@register.simple_tag(takes_context=True)
+def context_flat_menu(
+    context, handle, max_levels=None, show_menu_heading=False,
+    apply_active_classes=False, allow_repeating_parents=True,
+    show_multiple_levels=True, template='', sub_menu_template='',
+    sub_menu_templates=None, fall_back_to_default_site_menus=None,
+    use_absolute_page_urls=False, add_sub_menus_inline=None,
+    **kwargs
+):
+    validate_supplied_values('flat_menu', max_levels=max_levels)
+
+    if fall_back_to_default_site_menus is None:
+        fall_back_to_default_site_menus = settings.FLAT_MENUS_FALL_BACK_TO_DEFAULT_SITE_MENUS
+
+    if not show_multiple_levels:
+        max_levels = 1
+
+    menu_class = settings.models.FLAT_MENU_MODEL
+    return menu_class.render_from_tag(
+        context=context,
+        handle=context['group_name'],
+        fall_back_to_default_site_menus=fall_back_to_default_site_menus,
+        max_levels=max_levels,
+        apply_active_classes=apply_active_classes,
+        allow_repeating_parents=allow_repeating_parents,
+        use_absolute_page_urls=use_absolute_page_urls,
+        add_sub_menus_inline=add_sub_menus_inline,
+        template_name=template,
+        sub_menu_template_name=sub_menu_template,
+        sub_menu_template_names=split_if_string(sub_menu_templates),
+        show_menu_heading=show_menu_heading,
+        **kwargs
+    )
+
 
 @register.simple_tag(takes_context=True)
 def section_menu(
